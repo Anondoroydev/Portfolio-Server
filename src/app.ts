@@ -7,6 +7,7 @@ import { prisma } from "./config/prisma.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { AppError } from "./utils/appError.js";
 import authRoutes from "./routes/auth.routes.js";
+import chatRoutes from "./routes/chat.routes.js";
 import contactRoutes from "./routes/contact.routes.js";
 import projectRoutes from "./routes/project.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
@@ -50,6 +51,12 @@ app.use("/api/auth", rateLimit({
 }), authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/chat", rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 15,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+}), chatRoutes);
 app.use("/api/contact", rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 5,

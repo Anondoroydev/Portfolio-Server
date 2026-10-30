@@ -43,6 +43,18 @@ The API listens on `http://localhost:3000` by default. `CORS_ORIGIN` accepts a c
 
 Use the token returned by login as `Authorization: Bearer <token>` for protected project and review operations. Reviews are admin-managed; create them unpublished, then set `published: true` to make them visible publicly. Contact messages are stored before notification and auto-reply emails are attempted. Gemini drafts an automatic reply grounded in `AI_PORTFOLIO_CONTEXT`; if Gemini fails, a generic acknowledgement is emailed instead. Check `notificationSent`, `autoReplySent`, and `aiReplyGenerated` in the response. Contact text is sent to Google Gemini and Resend, so disclose this in the site's privacy notice.
 
+### Live chat API
+
+`POST /api/chat` accepts conversation history and returns a Gemini-generated reply. It is stateless: the frontend sends the history with each message, so chat conversations are not stored in the database. The API accepts up to 12 alternating user/model messages, ending in a user message; each message is limited to 2,000 characters. Chat is limited to 15 requests per IP per 15 minutes by default.
+
+```sh
+curl -i -X POST http://localhost:3000/api/chat \
+  -H 'Content-Type: application/json' \
+  --data '{"messages":[{"role":"user","text":"তোমার portfolio-তে কী কী project আছে?"}]}'
+```
+
+The response is `{ "reply": "..." }`. To continue a conversation, the frontend should append that reply as `{ "role": "model", "text": "..." }` and send the full message list with the next user message. This backend endpoint does not itself add a visible chat button/widget; the frontend must call it and render the messages. Chat messages are sent to Google Gemini, so disclose this in the site's privacy notice.
+
 ## Build and run
 
 ```sh
